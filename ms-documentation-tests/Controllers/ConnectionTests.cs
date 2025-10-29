@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace ms_documentation_tests;
+namespace ms_documentation_tests.Controllers;
 
-public class ConnectionTests : IClassFixture<WebApplicationFactory<ms_documentation.Program>>
+public class ConnectionTests(WebApplicationFactory<ms_documentation.Program> factory) 
+                : IClassFixture<WebApplicationFactory<ms_documentation.Program>>
 {
-    private readonly HttpClient _client;
-
-    public ConnectionTests(WebApplicationFactory<ms_documentation.Program> factory)
-    {
-        _client = factory.CreateClient();
-    }
+    private readonly HttpClient _client = factory.CreateClient();
 
     [Fact]
     public async Task DoesServiceRespond()
