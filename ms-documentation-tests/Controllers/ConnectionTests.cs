@@ -10,7 +10,7 @@ public class ConnectionTests(WebApplicationFactory<ms_documentation.Program> fac
     [Fact]
     public async Task DoesServiceRespond()
     {
-        var response = await _client.GetAsync("/health");
+        var response = await _client.GetAsync("/");
 
         response.EnsureSuccessStatusCode();
 
