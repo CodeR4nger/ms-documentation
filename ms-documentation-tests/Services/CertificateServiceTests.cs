@@ -2,11 +2,18 @@ using System.Text;
 using ms_documentation_tests.Utils;
 using ms_documentation.Services;
 using UglyToad.PdfPig;
+using Xceed.Words.NET;
+using ms_documentation.Models;
+
 
 namespace ms_documentation_tests.Services;
 
 public class CertificateServiceTests()
 {
+    private static bool IsFileEmpty(byte[] file)
+    {
+        return file == null || file.Length <= 0;
+    }
     private static string GetPDFText(byte[] pdfData)
     {
         using var pdfStream = new MemoryStream(pdfData);
@@ -19,17 +26,9 @@ public class CertificateServiceTests()
 
         return pdfText.ToString();
     }
-    [Fact]
-    public void CanGeneratePDFCertificate()
+    private static void AssertCertificateText(string? fullText,Alumno alumno)
     {
-        var alumno = MockDataFactory.CreateAlumno();
-        var certificateFile = CertificateService.GeneratePDF(alumno);
-
-        Assert.NotNull(certificateFile);
-        Assert.True(certificateFile.Length > 0);
-
-        var fullText = GetPDFText(certificateFile);
-
+        Assert.NotNull(fullText);
         var expectedValues = new[]
         {
             alumno.Nombre,
@@ -50,5 +49,31 @@ public class CertificateServiceTests()
         {
             Assert.Contains(Normalize(value), normalizedText);
         }
+    }
+    [Fact]
+    public void CanGeneratePDFCertificate()
+    {
+        var alumno = MockDataFactory.CreateAlumno();
+        var certificateFile = CertificateService.GeneratePDF(alumno);
+
+        Assert.False(IsFileEmpty(certificateFile));
+
+        var fullText = GetPDFText(certificateFile);
+
+        AssertCertificateText(fullText, alumno);
+    }
+    [Fact]
+    public void CanGenerateDocxCertificate()
+    {
+        var alumno = MockDataFactory.CreateAlumno();
+        var certificateFile = CertificateService.GenerateDocx(alumno);
+
+        Assert.False(IsFileEmpty(certificateFile));
+        
+        using var memoryStream = new MemoryStream(certificateFile);
+        using var wordDocument = DocX.Load(memoryStream);
+        var documentText = wordDocument.Text;
+
+        AssertCertificateText(documentText, alumno);
     }
 }
