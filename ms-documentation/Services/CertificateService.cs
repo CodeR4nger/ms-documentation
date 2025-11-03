@@ -1,3 +1,7 @@
+using System.IO.Compression;
+using System.Text;
+using AODL.Document.Content;
+using AODL.Document.TextDocuments;
 using ms_documentation.Models;
 using ms_documentation.Utils;
 using Xceed.Words.NET;
@@ -35,7 +39,7 @@ public class CertificateService()
     {
         var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "certificado_docx.docx");
         using var memoryStream = new MemoryStream();
-        
+
         using (var fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read))
         {
             fileStream.CopyTo(memoryStream);
@@ -60,5 +64,73 @@ public class CertificateService()
             doc.SaveAs(outputStream);
             return outputStream.ToArray();
         }
+    }
+    public static byte[] GenerateOdt(Alumno alumno)
+    {
+        // Template file path
+        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "certificado_odt.odt");
+
+        // Read the whole template into memory
+        byte[] templateBytes = File.ReadAllBytes(templatePath);
+
+        using var inputStream = new MemoryStream(templateBytes);
+        using var outputStream = new MemoryStream();
+
+        // Open the existing ODT (zip) and create a new zip to write modified entries
+        using (var inputArchive = new ZipArchive(inputStream, ZipArchiveMode.Read, leaveOpen: true))
+        using (var outputArchive = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            // Copy all entries by default, but for content.xml and styles.xml we will replace text
+            foreach (var entry in inputArchive.Entries)
+            {
+                ZipArchiveEntry newEntry = outputArchive.CreateEntry(entry.FullName, CompressionLevel.Optimal);
+
+                // We'll handle content.xml and styles.xml specially
+                if (string.Equals(entry.FullName, "content.xml", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(entry.FullName, "styles.xml", StringComparison.OrdinalIgnoreCase))
+                {
+                    using var entryStream = entry.Open();
+                    using var reader = new StreamReader(entryStream, Encoding.UTF8);
+                    string xmlText = reader.ReadToEnd();
+
+                    // Perform replacements
+                    xmlText = ReplacePlaceholders(xmlText, alumno);
+
+                    // Write replaced XML into new archive entry
+                    using var newEntryStream = newEntry.Open();
+                    using var writer = new StreamWriter(newEntryStream, Encoding.UTF8);
+                    writer.Write(xmlText);
+                    writer.Flush();
+                }
+                else
+                {
+                    // Copy other entries verbatim (manifest, meta, pictures, etc.)
+                    using var entryStream = entry.Open();
+                    using var newEntryStream = newEntry.Open();
+                    entryStream.CopyTo(newEntryStream);
+                }
+            }
+        }
+
+        // Return the newly created ODT bytes
+        outputStream.Position = 0;
+        return outputStream.ToArray();
+    }
+
+    private static string ReplacePlaceholders(string xmlText, Alumno alumno)
+    {
+        // Keep replacements simple - use invariant culture formatting where appropriate
+        xmlText = xmlText.Replace("{{fecha}}", DateTime.Now.ToLongDateString(), StringComparison.Ordinal);
+        xmlText = xmlText.Replace("{{alumno.nombre}}", alumno.Nombre, StringComparison.Ordinal);
+        xmlText = xmlText.Replace("{{alumno.apellido}}", alumno.Apellido, StringComparison.Ordinal);
+        xmlText = xmlText.Replace("{{alumno.tipo_documento.sigla}}", alumno.TipoDocumento.ToString(), StringComparison.Ordinal);
+        xmlText = xmlText.Replace("{{alumno.nrodocumento}}", alumno.NroDocumento, StringComparison.Ordinal);
+        xmlText = xmlText.Replace("{{alumno.nro_legajo}}", alumno.NroLegajo.ToString(), StringComparison.Ordinal);
+        xmlText = xmlText.Replace("{{especialidad.nombre}}", alumno.Especialidad.Nombre, StringComparison.Ordinal);
+        xmlText = xmlText.Replace("{{facultad.nombre}}", alumno.Especialidad.Facultad.Nombre, StringComparison.Ordinal);
+        xmlText = xmlText.Replace("{{universidad.nombre}}", alumno.Especialidad.Facultad.Universidad.Nombre, StringComparison.Ordinal);
+        xmlText = xmlText.Replace("{{facultad.ciudad}}", alumno.Especialidad.Facultad.Ciudad, StringComparison.Ordinal);
+
+        return xmlText;
     }
 }

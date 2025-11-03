@@ -9,6 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AODL" Version="1.2.0.1">
+      <NoWarn>NU1701</NoWarn>
+    </PackageReference>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="DocX" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.10" />
