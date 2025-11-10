@@ -1,7 +1,5 @@
 using System.IO.Compression;
 using System.Text;
-using AODL.Document.Content;
-using AODL.Document.TextDocuments;
 using ms_documentation.Models;
 using ms_documentation.Utils;
 using Xceed.Words.NET;
