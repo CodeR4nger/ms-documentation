@@ -15,7 +15,7 @@ public class AlumnoMappingTests
             Id = 1,
             Apellido = alumno.Apellido,
             Nombre = alumno.Nombre,
-            NroDocumento = alumno.NroDocumento,
+            NroDocumento = long.Parse(alumno.NroDocumento),
             TipoDocumento = alumno.TipoDocumento.ToString(),
             NroLegajo = alumno.NroLegajo,
             FechaNacimiento = "11-04-1999",

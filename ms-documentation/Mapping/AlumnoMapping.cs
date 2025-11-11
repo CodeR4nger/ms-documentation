@@ -12,7 +12,7 @@ public class AlumnoDTO
     [JsonPropertyName("nombre")]
     public required string Nombre { get; set; }
     [JsonPropertyName("nro_documento")]
-    public required string NroDocumento { get; set; }
+    public required long NroDocumento { get; set; }
     [JsonPropertyName("tipo_documento")]
     public required string TipoDocumento { get; set; }
     [JsonPropertyName("fecha_nacimiento")]
@@ -36,7 +36,7 @@ public static class AlumnoMapper
         {
             Nombre = alumnoDTO.Nombre,
             Apellido = alumnoDTO.Apellido,
-            NroDocumento = alumnoDTO.NroDocumento,
+            NroDocumento = alumnoDTO.NroDocumento.ToString(),
             TipoDocumento = Enum.TryParse(alumnoDTO.TipoDocumento, ignoreCase: true, out TipoDocumento tipoDocumento)
                             ? tipoDocumento
                             : throw new ArgumentException($"Tipo de documento inválido: {alumnoDTO.TipoDocumento}"),
