@@ -39,6 +39,10 @@ public class AlumnoClientTests
     [Fact]
     public async Task CanHandleInvalidAlumnoId()
     {
-        
+        await Assert.ThrowsAsync<HttpRequestException>(async () =>
+        {
+            var alumnoDTO = await _client.GetAlumnoByIdAsync(-1);
+        });
     }
+
 }
