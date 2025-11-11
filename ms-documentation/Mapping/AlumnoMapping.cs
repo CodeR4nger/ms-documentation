@@ -32,14 +32,18 @@ public static class AlumnoMapper
 {
     public static Alumno FromDTO(AlumnoDTO alumnoDTO,Especialidad especialidad)
     {
+        ArgumentNullException.ThrowIfNull(alumnoDTO);
+        ArgumentNullException.ThrowIfNull(especialidad);
+
+        if (!Enum.TryParse(alumnoDTO.TipoDocumento, ignoreCase: true, out TipoDocumento tipoDocumento))
+            throw new ArgumentException($"Tipo de documento inválido: {alumnoDTO.TipoDocumento}");
+
         return new()
         {
             Nombre = alumnoDTO.Nombre,
             Apellido = alumnoDTO.Apellido,
             NroDocumento = alumnoDTO.NroDocumento.ToString(),
-            TipoDocumento = Enum.TryParse(alumnoDTO.TipoDocumento, ignoreCase: true, out TipoDocumento tipoDocumento)
-                            ? tipoDocumento
-                            : throw new ArgumentException($"Tipo de documento inválido: {alumnoDTO.TipoDocumento}"),
+            TipoDocumento = tipoDocumento,
             NroLegajo = alumnoDTO.NroLegajo,
             Especialidad = especialidad,
         };
