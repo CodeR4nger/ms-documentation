@@ -115,6 +115,16 @@ public class CertificateService()
         return outputStream.ToArray();
     }
 
+    public static byte[]? Generate(string type,Alumno alumno)
+    {
+        if (type == "pdf")
+            return GeneratePDF(alumno);
+        if (type == "odt")
+            return GenerateOdt(alumno);
+        if (type == "docx")
+            return GenerateDocx(alumno);
+        return null;
+    }
     private static string ReplacePlaceholders(string xmlText, Alumno alumno)
     {
         // Keep replacements simple - use invariant culture formatting where appropriate

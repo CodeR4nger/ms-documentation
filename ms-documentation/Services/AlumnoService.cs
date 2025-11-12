@@ -5,7 +5,12 @@ using ms_documentation.Models;
 
 namespace ms_documentation.Services;
 
-public class AlumnoService(IClienteAlumnos clienteAlumnos, IClienteGestion clienteGestion)
+public interface IAlumnoService
+{
+    Task<Alumno?> GetAlumnoFromId(int id);
+}
+
+public class AlumnoService(IClienteAlumnos clienteAlumnos, IClienteGestion clienteGestion) : IAlumnoService
 {
     private readonly IClienteAlumnos _alumnoClient = clienteAlumnos;
     private readonly IClienteGestion _gestionClient = clienteGestion;
