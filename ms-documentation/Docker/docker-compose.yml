@@ -1,0 +1,24 @@
+name: ms-documentation
+services:    
+    documentacion:
+        image: ms-documentation:1.0.1
+        deploy:
+            replicas: 2
+        environment:
+            - ALUMNOS_API_URI=${ALUMNOS_API_URI}
+            - ALUMNOS_API_GET=${ALUMNOS_API_GET}
+            - GESTION_API_URI=${GESTION_API_URI}
+            - GESTION_API_GET=${GESTION_API_GET}
+        networks:
+            ms-red:
+                aliases:
+                    - documentacion.universidad.localhost
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.documentacion.rule=Host(`documentacion.universidad.localhost`)"
+            - "traefik.http.routers.documentacion.tls=true"
+            - "traefik.http.services.documentacion.loadbalancer.server.port=5111"
+            - "traefik.docker.network=ms-red"    
+networks:
+  ms-red:
+    external: true
