@@ -24,7 +24,6 @@ public class CertificateService()
                    .Replace("{{especialidad.nombre}}",alumno.Especialidad.Nombre)
                    .Replace("{{facultad.nombre}}",alumno.Especialidad.Facultad.Nombre)
                    .Replace("{{universidad.nombre}}",alumno.Especialidad.Facultad.Universidad.Nombre)
-                   .Replace("{{facultad.ciudad}}",alumno.Especialidad.Facultad.Ciudad)
                    ;
     }
     public static byte[] GeneratePDF(Alumno alumno)
@@ -56,7 +55,6 @@ public class CertificateService()
             doc.ReplaceText("{{especialidad.nombre}}", alumno.Especialidad.Nombre);
             doc.ReplaceText("{{facultad.nombre}}", alumno.Especialidad.Facultad.Nombre);
             doc.ReplaceText("{{universidad.nombre}}", alumno.Especialidad.Facultad.Universidad.Nombre);
-            doc.ReplaceText("{{facultad.ciudad}}", alumno.Especialidad.Facultad.Ciudad);
             #pragma warning restore CS0618
             using var outputStream = new MemoryStream();
             doc.SaveAs(outputStream);
@@ -137,7 +135,6 @@ public class CertificateService()
         xmlText = xmlText.Replace("{{especialidad.nombre}}", alumno.Especialidad.Nombre, StringComparison.Ordinal);
         xmlText = xmlText.Replace("{{facultad.nombre}}", alumno.Especialidad.Facultad.Nombre, StringComparison.Ordinal);
         xmlText = xmlText.Replace("{{universidad.nombre}}", alumno.Especialidad.Facultad.Universidad.Nombre, StringComparison.Ordinal);
-        xmlText = xmlText.Replace("{{facultad.ciudad}}", alumno.Especialidad.Facultad.Ciudad, StringComparison.Ordinal);
 
         return xmlText;
     }

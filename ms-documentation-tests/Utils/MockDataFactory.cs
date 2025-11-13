@@ -21,7 +21,6 @@ public static class MockDataFactory
     public static Facultad CreateFacultad() => new()
     {
         Nombre = "Facultad de Sistemas",
-        Ciudad = "San Rafael",
         Universidad = CreateUniversidad(),
     };
     public static Universidad CreateUniversidad() => new()

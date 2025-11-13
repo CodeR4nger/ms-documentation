@@ -83,7 +83,6 @@ public static class CertificateReader
             alumno.TipoDocumento.ToString(),
             alumno.Especialidad.Nombre,
             alumno.Especialidad.Facultad.Nombre,
-            alumno.Especialidad.Facultad.Ciudad,
             alumno.Especialidad.Facultad.Universidad.Nombre
         };
 

@@ -7,13 +7,11 @@ public class EspecialidadDTO
 {
     [JsonPropertyName("id")]
     public required int Id { get; set;}
-    [JsonPropertyName("nombre")]
+    [JsonPropertyName("especialidad")]
     public required string Nombre { get; set; }
-    [JsonPropertyName("nombre_facultad")]
+    [JsonPropertyName("facultad")]
     public required string NombreFacultad { get; set; }
-    [JsonPropertyName("ciudad_facultad")]
-    public required string CiudadFacultad { get; set; }
-    [JsonPropertyName("nombre_universidad")]
+    [JsonPropertyName("universidad")]
     public required string NombreUniversidad { get; set; }
 }
 
@@ -28,7 +26,6 @@ public static class EspecialidadMapper
             Facultad = new()
             {
                 Nombre = especialidadDTO.NombreFacultad,
-                Ciudad = especialidadDTO.CiudadFacultad,
                 Universidad = new()
                 {
                     Nombre = especialidadDTO.NombreUniversidad

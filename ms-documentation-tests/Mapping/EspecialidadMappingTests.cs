@@ -15,7 +15,6 @@ public class EspecialidadMappingTests
             Id = 1,
             Nombre = especialidad.Nombre,
             NombreFacultad = especialidad.Facultad.Nombre,
-            CiudadFacultad = especialidad.Facultad.Ciudad,
             NombreUniversidad = especialidad.Facultad.Universidad.Nombre
         };
         Especialidad especialidadDTO = EspecialidadMapper.FromDTO(referenceDTO);
