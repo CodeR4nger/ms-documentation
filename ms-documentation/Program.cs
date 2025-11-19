@@ -1,4 +1,6 @@
-﻿using ms_documentation.Services;
+﻿using ms_documentation.Policies;
+
+using ms_documentation.Services;
 using ms_documentation.Utils;
 using StackExchange.Redis;
 
@@ -9,9 +11,8 @@ public partial class Program {
     {
         var env = new EnvironmentHandler();
         env.Load();
-        IDatabase? db = null;
         ConnectionMultiplexer? connection = null;
-
+        var builder = WebApplication.CreateBuilder(args);
         try
         {
             var config = new ConfigurationOptions
@@ -25,23 +26,30 @@ public partial class Program {
             connection = ConnectionMultiplexer.Connect(config);
 
             if (connection.IsConnected)
-                db = connection.GetDatabase();
+            {
+                Console.WriteLine("Conexion al cache establecida");
+                builder.Services.AddSingleton(connection.GetDatabase());
+            }
+            else
+            {
+                Console.WriteLine("La conexion al cache fallo, no se configurara el cache.");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Fallo la conexión al cache: {ex.Message}");
-            db = null;
+            Console.WriteLine($"Fallo la conexion al cache: {ex.Message}");
         }
-        var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddSingleton<IAlumnoService>( 
-            new AlumnoService(
-                new Clients.AlumnosClient(new HttpClient { BaseAddress = new Uri(env.Get("ALUMNOS_API_URI")) }),
-                new Clients.GestionClient(
-                        new HttpClient { BaseAddress = new Uri(env.Get("GESTION_API_URI")) },
-                        db
-                )
-            )
-        );
+        
+       builder.Services.AddHttpClient<Clients.IClienteAlumnos, Clients.AlumnosClient>(client =>
+        {
+            client.BaseAddress = new Uri(env.Get("ALUMNOS_API_URI"));
+        }).AddPolicyHandler(PollyPolicies.GetResiliencePolicy());
+        builder.Services.AddHttpClient<Clients.IClienteGestion,Clients.GestionClient>(client =>
+        {
+            client.BaseAddress = new Uri(env.Get("GESTION_API_URI"));
+        })
+        .AddPolicyHandler(PollyPolicies.GetResiliencePolicy());
+        builder.Services.AddSingleton<IAlumnoService, AlumnoService>();
         builder.Services.AddControllers();
         var app = builder.Build();
         app.MapControllers();

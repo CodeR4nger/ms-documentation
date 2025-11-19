@@ -16,7 +16,7 @@ public class GestionClient : IClienteGestion
     private readonly HttpClient _client;
     private readonly IDatabase? _cache;
 
-    public GestionClient(HttpClient client, IDatabase? cache)
+    public GestionClient(HttpClient client, IDatabase? cache = null)
     {
         _client = client;
         _client.DefaultRequestHeaders.Accept.Clear();
