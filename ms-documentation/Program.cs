@@ -1,4 +1,6 @@
-﻿using ms_documentation.Policies;
+﻿using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
+using ms_documentation.Policies;
 
 using ms_documentation.Services;
 using ms_documentation.Utils;
@@ -40,7 +42,7 @@ public partial class Program {
             Console.WriteLine($"Fallo la conexion al cache: {ex.Message}");
         }
         
-       builder.Services.AddHttpClient<Clients.IClienteAlumnos, Clients.AlumnosClient>(client =>
+        builder.Services.AddHttpClient<Clients.IClienteAlumnos, Clients.AlumnosClient>(client =>
         {
             client.BaseAddress = new Uri(env.Get("ALUMNOS_API_URI"));
         }).AddPolicyHandler(PollyPolicies.GetResiliencePolicy());
@@ -49,10 +51,21 @@ public partial class Program {
             client.BaseAddress = new Uri(env.Get("GESTION_API_URI"));
         })
         .AddPolicyHandler(PollyPolicies.GetResiliencePolicy());
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = 429;
+            options.AddConcurrencyLimiter(policyName: "concurrencyPolicy", limiterOptions =>
+            {
+                limiterOptions.PermitLimit = 10;
+                limiterOptions.QueueLimit = 100;
+                limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            });
+        });
         builder.Services.AddSingleton<IAlumnoService, AlumnoService>();
         builder.Services.AddControllers();
         var app = builder.Build();
         app.MapControllers();
+        app.UseRateLimiter();
         app.Run();
     }
 }
