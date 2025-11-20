@@ -17,7 +17,7 @@ public class GestionClientTests
         _env = new EnvironmentHandler();
         _env.Load();
         _httpClient = new HttpClient { BaseAddress = new Uri(_env.Get("GESTION_API_URI")) };
-        _client = new GestionClient(_httpClient,null);
+        _client = new GestionClient(_httpClient,_env,null);
     }
 
     [Fact]

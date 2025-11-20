@@ -15,6 +15,7 @@ public partial class Program {
         env.Load();
         ConnectionMultiplexer? connection = null;
         var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddSingleton<IEnvironmentHandler>(env);
         try
         {
             var config = new ConfigurationOptions

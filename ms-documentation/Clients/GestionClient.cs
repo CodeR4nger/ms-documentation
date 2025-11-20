@@ -15,14 +15,15 @@ public class GestionClient : IClienteGestion
 {
     private readonly HttpClient _client;
     private readonly IDatabase? _cache;
+    private readonly IEnvironmentHandler _env;
 
-    public GestionClient(HttpClient client, IDatabase? cache = null)
+    public GestionClient(HttpClient client,IEnvironmentHandler env, IDatabase? cache = null)
     {
         _client = client;
         _client.DefaultRequestHeaders.Accept.Clear();
         _client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
-
+        _env = env;
         _cache = cache;
     }
 
@@ -40,7 +41,7 @@ public class GestionClient : IClienteGestion
             }
         }
 
-        var url = $"{new EnvironmentHandler().Get("GESTION_API_GET")}/{id}";
+        var url = $"{_env.Get("GESTION_API_GET")}/{id}";
         var response = await _client.GetAsync(url);
 
         response.EnsureSuccessStatusCode();

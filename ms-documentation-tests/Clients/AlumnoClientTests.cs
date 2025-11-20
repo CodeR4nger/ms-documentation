@@ -17,7 +17,7 @@ public class AlumnoClientTests
         _env = new EnvironmentHandler();
         _env.Load();
         _httpClient = new HttpClient { BaseAddress = new Uri(_env.Get("ALUMNOS_API_URI")) };
-        _client = new AlumnosClient(_httpClient);
+        _client = new AlumnosClient(_httpClient,_env);
     }
 
     [Fact]

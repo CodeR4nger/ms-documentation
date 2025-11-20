@@ -26,8 +26,8 @@ public class CertificateControllerTests : IClassFixture<WebApplicationFactory<ms
         _env = new EnvironmentHandler();
         _env.Load();
         _httpClient = new HttpClient { BaseAddress = new Uri(_env.Get("ALUMNOS_API_URI")) };
-        _alumnoClient = new AlumnosClient(new HttpClient { BaseAddress = new Uri(_env.Get("ALUMNOS_API_URI")) });
-        _gestionClient = new GestionClient(new HttpClient { BaseAddress = new Uri(_env.Get("GESTION_API_URI")) },null);
+        _alumnoClient = new AlumnosClient(new HttpClient { BaseAddress = new Uri(_env.Get("ALUMNOS_API_URI")) },_env);
+        _gestionClient = new GestionClient(new HttpClient { BaseAddress = new Uri(_env.Get("GESTION_API_URI")) },_env,null);
         _service = new AlumnoService(_alumnoClient, _gestionClient);
     }
     private async Task<int> GetReferenceAlumnoId()

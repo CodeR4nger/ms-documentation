@@ -12,17 +12,19 @@ public interface IClienteAlumnos
 
 public class AlumnosClient : IClienteAlumnos
 {
-    readonly HttpClient _client;
-    public AlumnosClient(HttpClient client)
+    private readonly HttpClient _client;
+    private readonly IEnvironmentHandler _env;
+    public AlumnosClient(HttpClient client,IEnvironmentHandler env)
     {
         _client = client;
+        _env = env;
         _client.DefaultRequestHeaders.Accept.Clear();
         _client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
     }
     public async Task<AlumnoDTO?> GetAlumnoByIdAsync(int id)
     {
-        var response = await _client.GetAsync($"{new EnvironmentHandler().Get("ALUMNOS_API_GET")}/{id}");
+        var response = await _client.GetAsync($"{_env.Get("ALUMNOS_API_GET")}/{id}");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<AlumnoDTO>();
     } 
