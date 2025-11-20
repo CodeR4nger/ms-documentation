@@ -1,3 +1,4 @@
+using System.Net;
 using Moq;
 using Moq.Protected;
 using ms_documentation.Policies;
@@ -36,5 +37,26 @@ public class PollyPoliciesTests
             ItExpr.IsAny<HttpRequestMessage>(), 
             ItExpr.IsAny<CancellationToken>());
     }
+    [Fact]
+    public async Task Should_Not_Retry_On_404_Exception()
+    {
+        var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
+        handlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
+
+        var client = new HttpClient(handlerMock.Object);
+        
+        var policy = PollyPolicies.GetResiliencePolicy();
+
+        var response = await policy.ExecuteAsync(ctx => client.GetAsync("https://example.com"), new Context());
+
+        Assert.Equal(HttpStatusCode.NotFound,response.StatusCode);
+        handlerMock.Protected().Verify(
+            "SendAsync", 
+            Times.Exactly(1),
+            ItExpr.IsAny<HttpRequestMessage>(), 
+            ItExpr.IsAny<CancellationToken>());
+    }
 }

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using ms_documentation.Mapping;
 using ms_documentation.Utils;
@@ -43,7 +44,8 @@ public class GestionClient : IClienteGestion
 
         var url = $"{_env.Get("GESTION_API_GET")}/{id}";
         var response = await _client.GetAsync(url);
-
+        if (response.StatusCode.Equals(HttpStatusCode.NotFound))
+            return null;
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<EspecialidadDTO>();
     }

@@ -50,10 +50,8 @@ public class GestionClientTests
     [Fact]
     public async Task CanHandleInvalidEspecialidadId()
     {
-        await Assert.ThrowsAsync<HttpRequestException>(async () =>
-        {
             var especialidadDTO = await _client.GetEspecialidadByIdAsync(-1);
-        });
+            Assert.Null(especialidadDTO);
     }
     [Fact]
     public async Task CanGetEspecialidadFromCache()

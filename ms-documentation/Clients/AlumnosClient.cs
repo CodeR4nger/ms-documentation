@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using ms_documentation.Mapping;
 using ms_documentation.Utils;
@@ -25,6 +26,8 @@ public class AlumnosClient : IClienteAlumnos
     public async Task<AlumnoDTO?> GetAlumnoByIdAsync(int id)
     {
         var response = await _client.GetAsync($"{_env.Get("ALUMNOS_API_GET")}/{id}");
+        if (response.StatusCode.Equals(HttpStatusCode.NotFound))
+            return null;
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<AlumnoDTO>();
     } 
