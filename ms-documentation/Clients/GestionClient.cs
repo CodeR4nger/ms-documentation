@@ -29,7 +29,7 @@ public class GestionClient : IClienteGestion
 
     public async Task<EspecialidadDTO?> GetEspecialidadByIdAsync(int id)
     {
-        string cacheKey = $"especialidad_{id}";
+        string cacheKey = $"{_env.Get("GESTION_CACHE_PREFIX")}{id}";
 
         if (_cache != null)
         {

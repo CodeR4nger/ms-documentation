@@ -11,6 +11,7 @@ services:
             - GESTION_API_GET=${GESTION_API_GET}
             - CACHE_ADDRESS=${CACHE_ADDRESS}
             - CACHE_PASSWORD=${CACHE_PASSWORD}
+            - GESTION_CACHE_PREFIX=${GESTION_CACHE_PREFIX}
         networks:
             ms-red:
                 aliases:
