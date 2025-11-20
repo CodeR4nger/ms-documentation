@@ -1,7 +1,6 @@
+using System.IO.Compression;
 using System.Text;
 using System.Xml.Linq;
-using AODL.Document.Content;
-using AODL.Document.TextDocuments;
 using ms_documentation.Models;
 using UglyToad.PdfPig;
 using Xceed.Words.NET;
@@ -22,46 +21,44 @@ public static class CertificateReader
 
         return pdfText.ToString();
     }
-    public static string GetOdtText(byte[] data)
+    public static string GetOdtText(byte[] odtFileBytes)
     {
-        using var odtStream = new MemoryStream(data);
-        string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".odt");
         try
         {
-            using (var fileStream = File.Create(tempPath))
+            using (var memoryStream = new MemoryStream(odtFileBytes))
             {
-                odtStream.Seek(0, SeekOrigin.Begin);
-                odtStream.CopyTo(fileStream);
+                using (var zipArchive = new ZipArchive(memoryStream))
+                {
+                    var contentFile = zipArchive.GetEntry("content.xml");
+                    if (contentFile != null)
+                    {
+                        using (var stream = contentFile.Open())
+                        {
+                            XDocument doc = XDocument.Load(stream);
+                            StringBuilder sb = new StringBuilder();
+
+                            foreach (var paragraph in doc.Descendants("{urn:oasis:names:tc:opendocument:xmlns:text:1.0}p"))
+                            {
+                                foreach (var textElement in paragraph.Descendants("{urn:oasis:names:tc:opendocument:xmlns:text:1.0}span"))
+                                {
+                                    sb.Append(textElement.Value);
+                                }
+                                sb.AppendLine();
+                            }
+
+                            return sb.ToString();
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("No se encontró el archivo content.xml dentro del archivo ODT.");
+                    }
+                }
             }
-
-            var sb = new StringBuilder();
-            using (var doc = new TextDocument())
-            {
-                doc.Load(tempPath);
-
-                XElement stylesPart = XElement.Parse(doc.DocumentStyles.Styles.OuterXml);
-                string stylesText = string.Join(
-                    "\r\n",
-                    stylesPart
-                        .Descendants()
-                        .Where(x => x.Name.LocalName == "header" || x.Name.LocalName == "footer")
-                        .Select(y => y.Value)
-                );
-
-                var mainPart = doc.Content.Cast<IContent>();
-                var mainText = string.Join("\r\n", mainPart.Select(x => x.Node.InnerText));
-
-                sb.Append(stylesText);
-                sb.AppendLine();
-                sb.Append(mainText);
-            }
-
-            return sb.ToString();
         }
-        finally
+        catch (Exception ex)
         {
-            if (File.Exists(tempPath))
-                File.Delete(tempPath);
+            return $"Error al procesar el archivo ODT: {ex.Message}";
         }
     }
     public static string GetDocxText(byte[] data)
