@@ -1,7 +1,7 @@
 name: ms-documentation
 services:    
     documentacion:
-        image: ms-documentation:1.2.1
+        image: ms-documentation:1.2.2
         deploy:
             replicas: 2
         environment:
@@ -21,6 +21,10 @@ services:
             - "traefik.http.routers.documentacion.rule=Host(`documentacion.universidad.localhost`)"
             - "traefik.http.routers.documentacion.tls=true"
             - "traefik.http.services.documentacion.loadbalancer.server.port=5111"
+            # Rate limit
+            - "traefik.http.middlewares.documentacion.ratelimit.average=2"
+            - "traefik.http.middlewares.documentacion.ratelimit.period=1s"
+            - "traefik.http.middlewares.documentacion.ratelimit.burst=50"
             # Patron cortocircuito
             - "traefik.http.middlewares.documentacion.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
             - "traefik.http.middlewares.documentacion.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"

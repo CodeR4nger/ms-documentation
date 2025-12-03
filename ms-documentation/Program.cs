@@ -52,21 +52,10 @@ public partial class Program {
             client.BaseAddress = new Uri(env.Get("GESTION_API_URI"));
         })
         .AddPolicyHandler(PollyPolicies.GetResiliencePolicy());
-        builder.Services.AddRateLimiter(options =>
-        {
-            options.RejectionStatusCode = 429;
-            options.AddConcurrencyLimiter(policyName: "concurrencyPolicy", limiterOptions =>
-            {
-                limiterOptions.PermitLimit = 10;
-                limiterOptions.QueueLimit = 100;
-                limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-            });
-        });
         builder.Services.AddSingleton<IAlumnoService, AlumnoService>();
         builder.Services.AddControllers();
         var app = builder.Build();
         app.MapControllers();
-        app.UseRateLimiter();
         app.Run();
     }
 }
