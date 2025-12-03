@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     htop \
     iputils-ping \
+    libfontconfig1 \
     fonts-dejavu \
     fontconfig \
  && rm -rf /var/lib/apt/lists/*
@@ -22,6 +23,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0-noble-chiseled-extra
 WORKDIR /app
 
 COPY --from=build /usr/share/fonts /usr/share/fonts
+COPY --from=build /etc/fonts/fonts.conf /etc/fonts/fonts.conf
+
 
 COPY --from=build /app/publish .
 

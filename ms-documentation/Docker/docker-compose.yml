@@ -1,7 +1,7 @@
 name: ms-documentation
 services:    
     documentacion:
-        image: ms-documentation:1.2.2
+        image: ms-documentation:1.2.5
         deploy:
             replicas: 2
         environment:
