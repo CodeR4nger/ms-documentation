@@ -21,6 +21,11 @@ services:
             - "traefik.http.routers.documentacion.rule=Host(`documentacion.universidad.localhost`)"
             - "traefik.http.routers.documentacion.tls=true"
             - "traefik.http.services.documentacion.loadbalancer.server.port=5111"
+            # Patron cortocircuito
+            - "traefik.http.middlewares.documentacion.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
+            - "traefik.http.middlewares.documentacion.circuitbreaker.expression=ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+            - "traefik.http.middlewares.documentacion.circuitbreaker.expression=NetworkErrorRatio() > 0.5"
+            # Red
             - "traefik.docker.network=ms-red"    
 networks:
   ms-red:
