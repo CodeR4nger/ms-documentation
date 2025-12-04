@@ -20,6 +20,7 @@ services:
             - "traefik.enable=true"
             - "traefik.http.routers.documentacion.rule=Host(`documentacion.universidad.localhost`)"
             - "traefik.http.routers.documentacion.tls=true"
+            # Balanceo de cargas
             - "traefik.http.services.documentacion.loadbalancer.server.port=5111"
             # Rate limit
             - "traefik.http.middlewares.documentacion.ratelimit.average=2"
